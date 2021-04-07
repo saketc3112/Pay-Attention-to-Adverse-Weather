@@ -246,32 +246,18 @@ class ExampleCreator(object):
         for i in parsed_labels.classes:
             if i == b'Pedestrian':
                 la.append(1)
-            if i == b'DontCare':
-                la.append(0)
-            if i == b'Vehicle_is_group':
-                la.append(5)
-            if i == b'person':
-                la.append(1)
-            if i == b'RidableVehicle':
-                la.append(4)
-            if i == b'train':
-                la.append(2)
             if i == b'PassengerCar':
-                la.append(3)
-            if i == b'RidableVehicle_is_group':
-                la.append(4)
-            if i == b'LargeVehicle':
                 la.append(2)
+            if i == b'RidableVehicle':
+                la.append(3)
+            if i == b'LargeVehicle':
+                la.append(4)
             if i == b'Obstacle':
-                la.append(6)
-            if i == b'LargeVehicle_is_group':
-               la.append(2)
+                la.append(5)
             if i == b'Vehicle':
-                la.append(3)
-            if i == b'PassengerCar_is_group':
-                la.append(3)
-            if i == b'Pedestrian_is_group':
-                la.append(1)
+                la.append(6)
+            if i == b'DontCare':
+                la.append(7)
         parsed_labels.la = la
         print('Labels:', parsed_labels.la)
 
@@ -298,6 +284,8 @@ class SwedenImagesv2(ExampleCreator):
         dist_images = {}
         gated_images = {}
         dist_images_shape = {}
+        dist_images_height = {}
+        dist_images_width = {}
         gated_images_shape = {}
         dist_lidar = {}
         dist_lidar_shape = {}
@@ -313,6 +301,8 @@ class SwedenImagesv2(ExampleCreator):
             img_width, img_height = img.size
             dist_images[folder] = feature
             dist_images_shape[folder] = ([img_height, img_width, 3])
+            dist_images_height[folder] = ([img_height])
+            dist_images_width[folder] = ([img_width])
 
         for folder in self.point_keys:
             velodyne_name = entry_id + '.bin'
@@ -353,6 +343,9 @@ class SwedenImagesv2(ExampleCreator):
         # data['radar_data'] = radar
         # data['radar_shape'] = radar_shape
         data['image_shape'] = dist_images_shape
+        data['image_height'] = dist_images_height
+        data['image_width'] = dist_images_width
+        
         data['lidar_shape'] = dist_lidar_shape
         data['gated_shape'] = gated_images_shape
         data['label'] = o
@@ -373,6 +366,8 @@ class SwedenImagesv2(ExampleCreator):
         image_data = data['image_data']
         gated_data = data['gated_data']
         image_shape = data['image_shape']
+        image_height = data['image_height']
+        image_width = data['image_width']
         gated_shape = data['gated_shape']
         name = data['name']
         total_id = data['total_id']
@@ -382,41 +377,42 @@ class SwedenImagesv2(ExampleCreator):
 
 
         feature_dict = {
-            'key': int64_feature(int(total_id)),
-            'name': bytes_feature(name.encode("utf8")),
+            #'key': int64_feature(int(total_id)),
+            'image/filename': bytes_feature(name.encode("utf8")),
             'image/format': bytes_feature(image_format),
             'image/object/class/text': bytes_feature(label.classes),
-            'image/object/bbox/label': int64_feature(label.la),
+            'image/object/class/label': int64_feature(label.la),
             'image/object/bbox/xmin': float_feature(label.xmin),
             'image/object/bbox/xmax': float_feature(label.xmax),
             'image/object/bbox/ymin': float_feature(label.ymin),
             'image/object/bbox/ymax': float_feature(label.ymax),
-            'image/object/bbox/angle': float_feature(label.angle),
-            'image/object/truncation': float_feature(label.truncation),
-            'image/object/difficult': int64_feature(label.difficults),
-            'image/object/occlusion': int64_feature(label.occlusion),
-            'image/object/object/bbox3d/height': float_feature(label.height),
-            'image/object/bbox3d/width': float_feature(label.width),
-            'image/object/bbox3d/length': float_feature(label.length),
-            'image/object/bbox3d/x': float_feature(label.posx),
-            'image/object/bbox3d/y': float_feature(label.posy),
-            'image/object/bbox3d/z': float_feature(label.posz),
-            'image/object/bbox3d/alpha3d': float_feature(label.orient3d),
+            #'image/object/bbox/angle': float_feature(label.angle),
+            #'image/object/truncation': float_feature(label.truncation),
+            #'image/object/difficult': int64_feature(label.difficults),
+            #'image/object/occlusion': int64_feature(label.occlusion),
+            #'image/object/object/bbox3d/height': float_feature(label.height),
+            #'image/object/bbox3d/width': float_feature(label.width),
+            #'image/object/bbox3d/length': float_feature(label.length),
+            #'image/object/bbox3d/x': float_feature(label.posx),
+            #'image/object/bbox3d/y': float_feature(label.posy),
+            #'image/object/bbox3d/z': float_feature(label.posz),
+            #'image/object/bbox3d/alpha3d': float_feature(label.orient3d),
             #'label': int64_feature(label),
             }
 
         for key in self.image_keys:
-            feature_dict['image/' + key] = bytes_feature(image_data[key])
-            feature_dict['image/shape/' + key] = int64_feature([x for x in image_shape[key]])
-        for idx, point_key in enumerate(self.point_keys):
-            feature_dict['lidar/' + point_key] = float_feature(lidar_data[point_key].flatten().tolist())
-            feature_dict['lidar/shape/' + point_key] = int64_feature([x for x in lidar_data[point_key].shape])
+            feature_dict['image/encoded'] = bytes_feature(image_data[key])
+            feature_dict['image/height'] = int64_feature([x for x in image_height[key]])
+            feature_dict['image/width'] = int64_feature([x for x in image_width[key]])
+        #for idx, point_key in enumerate(self.point_keys):
+        #    feature_dict['lidar/' + point_key] = float_feature(lidar_data[point_key].flatten().tolist())
+        #    feature_dict['lidar/shape/' + point_key] = int64_feature([x for x in lidar_data[point_key].shape])
         # for idx, radar_key in enumerate(self.radar_keys):
         #     feature_dict['radar/'+radar_key] = float_feature(radar_data[radar_key].flatten().tolist())
         #     feature_dict['radar/shape/'+radar_key] = int64_feature([x for x in radar_data[radar_key].shape])
-        for key in self.gated_keys:
-            feature_dict['gated/' + key] = bytes_feature(gated_data[key])
-            feature_dict['gated/shape/' + key] = int64_feature([x for x in gated_shape[key]])
+        #for key in self.gated_keys:
+        #    feature_dict['gated/' + key] = bytes_feature(gated_data[key])
+        #    feature_dict['gated/shape/' + key] = int64_feature([x for x in gated_shape[key]])
 
         tf_train_example = tf.train.Example(features=tf.train.Features(feature=feature_dict))
         return tf_train_example
