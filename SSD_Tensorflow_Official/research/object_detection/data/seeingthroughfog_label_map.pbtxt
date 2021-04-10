@@ -1,34 +1,30 @@
 item {
   id: 1
-  name: 'pedestrian'
+  name: 'Pedestrian'
 }
 
 item {
   id: 2
-  name: 'car'
+  name: 'PassengerCar'
 }
 
 item {
   id: 3
-  name: 'cycle'
+  name: 'RidableVehicle'
 }
 
 item {
   id: 4
-  name: 'truck'
+  name: 'LargeVehicle'
 }
 
 item {
   id: 5
-  name: 'obstacle'
+  name: 'Obstacle'
 }
 
 item {
   id: 6
-  name: 'vehicle'
+  name: 'Vehicle'
 }
 
-item {
-  id: 7
-  name: 'dontcare'
-}
