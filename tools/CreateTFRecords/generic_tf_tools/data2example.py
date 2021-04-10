@@ -156,7 +156,8 @@ class ExampleCreator(object):
         o = o.__truediv__(image_shape)
         o.print_labelStruct()
         o = self.process_label_val(o)
-        o = self.process_edh(o)
+        o = self.process_class_val(o)
+        #o = self.process_edh(o)
 
 
         return o
@@ -207,9 +208,9 @@ class ExampleCreator(object):
                         object_dict['posz_lidar'] = pos_lidar[2]
 
                     kitti_object_list.append(object_dict)
-                x = set(all_classes)
-                print("****")
-                print("Unique Classes:",x)
+                #x = set(all_classes)
+                #print("****")
+                #print("Unique Classes:",x)
                 return kitti_object_list
 
         except:
@@ -246,21 +247,72 @@ class ExampleCreator(object):
         for i in parsed_labels.classes:
             if i == b'Pedestrian':
                 la.append(1)
+            if i == b'Pedestrian_is_group':
+                la.append(1)
+            if i == b'person':
+                la.append(1)
             if i == b'PassengerCar':
+                la.append(2)
+            if i == b'PassengerCar_is_group':
                 la.append(2)
             if i == b'RidableVehicle':
                 la.append(3)
+            if i == b'RidableVehicle_is_group':
+                la.append(3)
             if i == b'LargeVehicle':
+                la.append(4)
+            if i == b'LargeVehicle_is_group':
+                la.append(4)
+            if i == b'train':
                 la.append(4)
             if i == b'Obstacle':
                 la.append(5)
             if i == b'Vehicle':
                 la.append(6)
+            if i == b'Vehicle_is_group':
+                la.append(6)
             if i == b'DontCare':
-                la.append(7)
+                la.append(0)
         parsed_labels.la = la
         print('Labels:', parsed_labels.la)
 
+        return parsed_labels
+    def process_class_val(self, parsed_labels):
+        """
+        :return: label object with filled out labels value
+        """
+        ca = []
+        for i in parsed_labels.classes:
+            if i == b'Pedestrian':
+                ca.append(b'Pedestrian')
+            if i == b'Pedestrian_is_group':
+                ca.append(b'Pedestrian')
+            if i == b'person':
+                ca.append(b'Pedestrian')
+            if i == b'PassengerCar':
+                ca.append(b'PassengerCar')
+            if i == b'PassengerCar_is_group':
+                ca.append(b'PassengerCar')
+            if i == b'RidableVehicle':
+                ca.append(b'RidableVehicle')
+            if i == b'RidableVehicle_is_group':
+                ca.append(b'RidableVehicle')
+            if i == b'LargeVehicle':
+                ca.append(b'LargeVehicle')
+            if i == b'LargeVehicle_is_group':
+                ca.append(b'LargeVehicle')
+            if i == b'train':
+                ca.append(b'LargeVehicle')
+            if i == b'Obstacle':
+                ca.append(b'Obstacle')
+            if i == b'Vehicle':
+                ca.append(b'Vehicle')
+            if i == b'Vehicle_is_group':
+                ca.append(b'Vehicle')
+            if i == b'DontCare':
+                ca.append(b'DontCare')
+        parsed_labels.ca = ca
+        print('New Classes:', parsed_labels.ca)
         return parsed_labels
 
     def create_example(self, *args):
@@ -370,6 +422,7 @@ class SwedenImagesv2(ExampleCreator):
         image_width = data['image_width']
         gated_shape = data['gated_shape']
         name = data['name']
+        #print('Name:', name)
         total_id = data['total_id']
         # calibration_matrices = data['calibration_matrices']
         # print 'Doing the right stuff'
@@ -380,7 +433,7 @@ class SwedenImagesv2(ExampleCreator):
             #'key': int64_feature(int(total_id)),
             'image/filename': bytes_feature(name.encode("utf8")),
             'image/format': bytes_feature(image_format),
-            'image/object/class/text': bytes_feature(label.classes),
+            'image/object/class/text': bytes_feature(label.ca),
             'image/object/class/label': int64_feature(label.la),
             'image/object/bbox/xmin': float_feature(label.xmin),
             'image/object/bbox/xmax': float_feature(label.xmax),
