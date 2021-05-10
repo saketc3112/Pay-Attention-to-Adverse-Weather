@@ -4,8 +4,180 @@ import os
 import PIL.Image
 import json
 from PIL import Image
+import cv2
+import base64
+import json
+from pyquaternion import Quaternion
+import cv2
 
 all_classes = []
+
+def read_label(file, label_dir):
+    """Read label file and return object list"""
+    file_name = file.split('.png')[0]
+    print(file_name)
+    object_list = get_kitti_object_list(os.path.join(label_dir, file_name + '.txt'), camera_to_velodyne=camera_to_velodyne)
+    return object_list
+
+
+def load_calib_data(path_total_dataset, name_camera_calib, tf_tree):
+    """
+    :param path_total_dataset: Path to dataset root dir
+    :param name_camera_calib: Camera calib file containing image intrinsic
+    :param tf_tree: TF (transformation) tree containing translations from velodyne to cameras
+    :return:
+    """
+
+    with open(os.path.join(path_total_dataset, name_camera_calib), 'r') as f:
+        data_camera = json.load(f)
+
+    with open(os.path.join(path_total_dataset, tf_tree), 'r') as f:
+        data_extrinsics = json.load(f)
+
+    # Scan data extrinsics for transformation from lidar to camera
+    important_translations = ['lidar_hdl64_s3_roof', 'radar_ars300', 'cam_stereo_left_optical']
+    translations = []
+
+    for item in data_extrinsics:
+        if item['child_frame_id'] in important_translations:
+            translations.append(item)
+            if item['child_frame_id'] == 'cam_stereo_left_optical':
+                T_cam = item['transform']
+            elif item['child_frame_id'] == 'lidar_hdl64_s3_roof':
+                T_velodyne = item['transform']
+            elif item['child_frame_id'] == 'radar_ars300':
+                T_radar = item['transform']
+
+    # Use pyquaternion to setup rotation matrices properly
+    R_c_quaternion = Quaternion(w=T_cam['rotation']['w'] * 360 / 2 / np.pi, x=T_cam['rotation']['x'] * 360 / 2 / np.pi,
+                     y=T_cam['rotation']['y'] * 360 / 2 / np.pi, z=T_cam['rotation']['z'] * 360 / 2 / np.pi)
+    R_v_quaternion = Quaternion(w=T_velodyne['rotation']['w'] * 360 / 2 / np.pi, x=T_velodyne['rotation']['x'] * 360 / 2 / np.pi,
+                     y=T_velodyne['rotation']['y'] * 360 / 2 / np.pi, z=T_velodyne['rotation']['z'] * 360 / 2 / np.pi)
+
+    # Setup quaternion values as 3x3 orthogonal rotation matrices
+    R_c_matrix = R_c_quaternion.rotation_matrix
+    R_v_matrix = R_v_quaternion.rotation_matrix
+
+    # Setup translation Vectors
+    Tr_cam = np.asarray([T_cam['translation']['x'], T_cam['translation']['y'], T_cam['translation']['z']])
+    Tr_velodyne = np.asarray([T_velodyne['translation']['x'], T_velodyne['translation']['y'], T_velodyne['translation']['z']])
+    Tr_radar = np.asarray([T_radar['translation']['x'], T_radar['translation']['y'], T_radar['translation']['z']])
+
+    # Setup Translation Matrix camera to lidar -> ROS spans transformation from its children to its parents
+    # Therefore one inversion step is needed for zero_to_camera -> <parent_child>
+    zero_to_camera = np.zeros((3, 4))
+    zero_to_camera[0:3, 0:3] = R_c_matrix
+    zero_to_camera[0:3, 3] = Tr_cam
+    zero_to_camera = np.vstack((zero_to_camera, np.array([0, 0, 0, 1])))
+
+    zero_to_velodyne = np.zeros((3, 4))
+    zero_to_velodyne[0:3, 0:3] = R_v_matrix
+    zero_to_velodyne[0:3, 3] = Tr_velodyne
+    zero_to_velodyne = np.vstack((zero_to_velodyne, np.array([0, 0, 0, 1])))
+
+    zero_to_radar = zero_to_velodyne.copy()
+    zero_to_radar[0:3, 3] = Tr_radar
+
+    # Calculate total extrinsic transformation to camera
+    velodyne_to_camera = np.matmul(np.linalg.inv(zero_to_camera), zero_to_velodyne)
+    camera_to_velodyne = np.matmul(np.linalg.inv(zero_to_velodyne), zero_to_camera)
+    radar_to_camera = np.matmul(np.linalg.inv(zero_to_camera), zero_to_radar)
+
+    # Read projection matrix P and camera rectification matrix R
+    P = np.reshape(data_camera['P'], [3, 4])
+
+    # In our case rectification matrix R has to be equal to the identity as the projection matrix P contains the
+    # R matrix w.r.t KITTI definition
+    R = np.identity(4)
+
+    # Calculate total transformation matrix from velodyne to camera
+    vtc = np.matmul(np.matmul(P, R), velodyne_to_camera)
+
+    return velodyne_to_camera, camera_to_velodyne, P, R, vtc, radar_to_camera, zero_to_camera
+
+
+def project_3d_to_2d(points3d, P):
+    points2d = np.matmul(P, np.vstack((points3d, np.ones([1, np.shape(points3d)[1]]))))
+
+    # scale projected points
+    points2d[0][:] = points2d[0][:] / points2d[2][:]
+    points2d[1][:] = points2d[1][:] / points2d[2][:]
+
+    points2d = points2d[0:2]
+    return points2d.transpose()
+
+def project_points_to_2d(points3d, P):
+    points2d = np.dot(P[:3, :3], points3d.T).T + P[:3, 3]
+    points2d = points2d[:, :2] / points2d[:, 2][:, np.newaxis]
+    points2d = points2d.astype(np.int32)
+    return points2d
+
+def lidar_project_vtc():
+    path_total_dataset = "/data/datasets/saket/SeeingThroughFogData"
+    name_camera_calib = "calib_cam_stereo_left.json"
+    tf_tree = "calib_tf_tree_full.json"
+    #scan = load_velodyne_scan(scan_path)
+    velodyne_to_camera, camera_to_velodyne, P, R, vtc, radar_to_camera, zero_to_camera = load_calib_data(path_total_dataset, name_camera_calib, tf_tree)
+
+    return vtc
+
+def lidar_project_points(pointcloud, vtc):
+    ps = project_3d_to_2d(pointcloud[:,:3].transpose(), vtc)
+    return ps
+
+def lidar_points_image(points,
+                           ps,
+                           test_image,
+                           cmap="jet",
+                           saveto = "/home/saket/Dense/lidar_proj.png",
+                           ):
+
+    x_lidar = points[:, 0]
+    y_lidar = points[:, 1]
+    z_lidar = points[:, 2]
+    r_lidar = points[:, 3] # Reflectance
+    # Distance relative to origin when looked from top
+    d_lidar = np.sqrt(x_lidar ** 2 + y_lidar ** 2)
+    # Absolute distance relative to origin
+    # d_lidar = np.sqrt(x_lidar ** 2 + y_lidar ** 2, z_lidar ** 2)
+
+    # PLOT THE IMAGE
+    from scipy import ndimage
+    import matplotlib as mpl
+    import matplotlib.cm as cm
+    from matplotlib import pyplot as plt
+    fig = plt.figure(dpi=200)
+    ax = plt.gca()
+
+    #d_lidar = np.sqrt(x_lidar ** 2 + y_lidar ** 2)
+    pixel_values = -d_lidar
+    #plt.figure(dpi=200)
+    ax.scatter(ps[:, 0], ps[:, 1], s=1, c=pixel_values, linewidths=0, alpha=0.5, cmap=cmap)
+
+    #z_lidar = pointcloud[:, 2]
+    #pixel_values = z_lidar
+    #fig, ax = plt.subplots(dpi=200)
+    #plt.figure(dpi=200)
+    #ax.scatter(ps[:, 0], ps[:, 1], s=1, c=pixel_values, linewidths=0, alpha=0.5, cmap=cmap)
+
+
+    #r_lidar = pointcloud[:, 3]
+    #pixel_values = r_lidar
+    #ax.figure(dpi=200)
+    #ax.scatter(ps[:, 0], ps[:, 1], s=1, c=pixel_values, linewidths=0, alpha=0.5, cmap=cmap)
+    ax.imshow(test_image)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.axes.get_xaxis().set_visible(False)
+
+    dpi = 200
+    if saveto is not None:
+        fig.savefig(saveto, dpi=dpi, bbox_inches='tight', pad_inches=0.0)
+    #else:
+    #    fig.show()
+
+    feature = open(saveto, 'rb').read()
+
+    return feature
 
 def birds_eye_point_cloud(pointcloud, side_range=(-10, 10),
                           fwd_range=(-10,10),
@@ -49,10 +221,18 @@ def birds_eye_point_cloud(pointcloud, side_range=(-10, 10),
     im[-y_img, x_img] = pixel_values # -y because images start from top left
 
     # Convert from numpy array to a PIL image
-    im = Image.fromarray(im).tobytes()
-    #newsize = (1792, 768)
-    #im = im.resize(newsize)
-    return im
+    im = Image.fromarray(im)
+    #im = bytes(im)
+    #im = base64.b64encode(im)
+    #encoded = cv2.imencode(cv2.UMat, im)[1].tostring()
+    newsize = (1792, 768)
+    im = im.resize(newsize)
+    saveto = "/home/saket/Dense/lidar_proj.png"
+    im.save(saveto)
+    feature = open(saveto, 'rb').read()
+    #img = PIL.Image.open(saveto, mode="r")
+
+    return feature
 
 def int64_feature(value):
     """Wrapper for inserting int64 features into Example proto.
@@ -170,7 +350,7 @@ class ExampleCreator(object):
     def __init__(self):
         pass
 
-    def load_velo_scan(self, file):
+    def load_velo_scan(self, file): 
         """Load and parse a velodyne binary file."""
         scan = np.fromfile(file, dtype=np.float32)
         return scan.reshape((-1, 5))
@@ -399,6 +579,8 @@ class SwedenImagesv2(ExampleCreator):
 
         for folder in self.image_keys:
             file_path = os.path.join(self.source_dir, folder, entry_id + '.png')
+            # new image
+            #image = cv2.imshow("test", file_path)
             feature = open(file_path, 'rb').read()
             img = PIL.Image.open(file_path, mode="r")
             img_width, img_height = img.size
@@ -411,25 +593,29 @@ class SwedenImagesv2(ExampleCreator):
         for folder in self.point_keys:
             velodyne_name = entry_id + '.bin'
             velodyne_path = os.path.join(self.source_dir, folder, velodyne_name)
-            numpy_lidar = self.load_velo_scan(velodyne_path)
-            numpy_lidar_shape = numpy_lidar.shape
+            pointcloud = self.load_velo_scan(velodyne_path)
+            numpy_lidar_shape = pointcloud.shape
             #dist_lidar[folder] = numpy_lidar
             #dist_lidar_shape[folder] = numpy_lidar_shape
             assert len(numpy_lidar_shape) == 2
-            lidar_bev = birds_eye_point_cloud(numpy_lidar, side_range=(-20, 20),
-                          fwd_range=(-20,20),
-                          res=0.2,
-                          min_height = -2.73,
-                          max_height = 1.27)
+            vtc = lidar_project_vtc()
+            ps = lidar_project_points(pointcloud, vtc)
+            fig = lidar_points_image(points=pointcloud,ps=ps,test_image=img,cmap="jet")
+            #lidar_bev = birds_eye_point_cloud(numpy_lidar, side_range=(-20, 20),
+            #              fwd_range=(-20,20),
+            #              res=0.2,
+            #              min_height = -2.73,
+            #              max_height = 1.27)
             #with open(lidar_bev, "rb") as image:
             #lidar_bev = lidar_bev.read()
             #lidar_bev = bytearray(lidar_bev)
-            dist_lidar[folder] = lidar_bev
-            img_width, img_height = 1792,768
-            #dist_lidar_shape[folder] = ([img_height, img_width, 3])
+            #dist_lidar[folder] = lidar_bev
+            dist_lidar[folder] = fig
+            img_width, img_height = img.size
+            dist_lidar_shape[folder] = ([img_height, img_width, 3])
             dist_images_height[folder] = ([img_height])
             dist_images_width[folder] = ([img_width])
-            #dist_lidar_shape[folder] = lidar_bev.shape
+            #dist_lidar_shape[folder] = img.shape
         #
         # @ TODO add if needed
         # for folder in self.radar_keys:
