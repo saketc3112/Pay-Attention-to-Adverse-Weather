@@ -1,3 +1,13 @@
+"""
+Simple Fusion is performed with InceptionV2 model. The following line represents 
+the logic of fusion:
+1. Model with Camera Input
+2. Model with Gated Input
+3. Fuse Camera and Gated Model
+4. Final few layers
+"""
+
+
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -468,7 +478,7 @@ def inception_v2_base(inputs,
     raise ValueError('Unknown final endpoint %s' % final_endpoint)
 
 
-def inception_v2(inputs,
+def inception_v2(inputs_camera, inputs_gated,
                  num_classes=1000,
                  is_training=True,
                  dropout_keep_prob=0.8,
@@ -527,12 +537,19 @@ def inception_v2(inputs,
 
   # Final pooling and prediction
   with tf.variable_scope(
-      scope, 'InceptionV2', [inputs], reuse=reuse) as scope:
+      scope, 'InceptionV2', [inputs_camera, inputs_gated], reuse=reuse) as scope:
     with slim.arg_scope([slim.batch_norm, slim.dropout],
                         is_training=is_training):
-      net, end_points = inception_v2_base(
-          inputs, scope=scope, min_depth=min_depth,
+      # Camera Model
+      net_camera, end_points = inception_v2_base(
+          inputs_camera, scope=scope, min_depth=min_depth,
           depth_multiplier=depth_multiplier)
+      # Gated Model
+      net_gated, end_points = inception_v2_base(
+          inputs_gated, scope=scope, min_depth=min_depth,
+          depth_multiplier=depth_multiplier)
+      # Fusion
+      net = tf.concat(axis=concat_dim, values = [net_camera, net_gated])
       with tf.variable_scope('Logits'):
         if global_pool:
           # Global average pooling.
