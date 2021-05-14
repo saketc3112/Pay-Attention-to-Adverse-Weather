@@ -147,7 +147,7 @@ class ExampleCreator(object):
     def proces_label(self, entry_id, image_shape):
 
         object_list = self.get_kitti_object_list(
-            os.path.join(self.source_dir, 'gt_labels_cmore_copied_together/cam_left_labels_TMP', entry_id + '.txt'))
+            os.path.join(self.source_dir, 'gt_labels_cmore_copied_together/gated_labels_TMP', entry_id + '.txt'))
 
         o = labelStruct()
         for object in object_list:
@@ -323,7 +323,7 @@ class ExampleCreator(object):
 
 
 class SwedenImagesv2(ExampleCreator):
-    gated_keys = ['gated0_rect8', 'gated1_rect8', 'gated2_rect8', 'gated_full_acc_rect8']
+    gated_keys = ['gated1_rect8']
     image_keys = ['cam_stereo_left_lut']
     point_keys = ['lidar_hdl64_last', 'lidar_hdl64_strongest']
     radar_keys = ['radar_ars300_tfl']
@@ -339,6 +339,8 @@ class SwedenImagesv2(ExampleCreator):
         dist_images_height = {}
         dist_images_width = {}
         gated_images_shape = {}
+        gated_images_height = {}
+        gated_images_width = {}
         dist_lidar = {}
         dist_lidar_shape = {}
         # @ TODO add if needed
@@ -382,7 +384,8 @@ class SwedenImagesv2(ExampleCreator):
             img_width, img_height = img.size
             gated_images[folder] = feature
             gated_images_shape[folder] = ([img_height, img_width, 3])
-
+            gated_images_height[folder] = ([img_height])
+            gated_images_width[folder] = ([img_width])
 
 
         o = self.proces_label(entry_id, dist_images_shape[self.image_keys[0]])
@@ -397,9 +400,13 @@ class SwedenImagesv2(ExampleCreator):
         data['image_shape'] = dist_images_shape
         data['image_height'] = dist_images_height
         data['image_width'] = dist_images_width
+
+        data['gated_shape'] = gated_images_shape
+        data['gated_height'] = gated_images_height
+        data['gated_width'] = gated_images_width
         
         data['lidar_shape'] = dist_lidar_shape
-        data['gated_shape'] = gated_images_shape
+        #data['gated_shape'] = gated_images_shape
         data['label'] = o
         # data['calibration_matrices'] = self.return_calib_dict(self.source_dir, 'calib_sweden')
         data['name'] = entry_id
@@ -416,11 +423,14 @@ class SwedenImagesv2(ExampleCreator):
         lidar_data = data['lidar_data']
         # radar_data = data['radar_data']
         image_data = data['image_data']
-        gated_data = data['gated_data']
         image_shape = data['image_shape']
         image_height = data['image_height']
         image_width = data['image_width']
+
+        gated_data = data['gated_data']
         gated_shape = data['gated_shape']
+        gated_height = data['gated_height']
+        gated_width = data['gated_width']
         name = data['name']
         #print('Name:', name)
         total_id = data['total_id']
@@ -457,9 +467,15 @@ class SwedenImagesv2(ExampleCreator):
             feature_dict['image/encoded'] = bytes_feature(image_data[key])
             feature_dict['image/height'] = int64_feature([x for x in image_height[key]])
             feature_dict['image/width'] = int64_feature([x for x in image_width[key]])
+        
+        for key in self.gated_keys:
+            feature_dict['gated/encoded'] = bytes_feature(gated_data[key])
+            feature_dict['gated/height'] = int64_feature([x for x in gated_height[key]])
+            feature_dict['gated/width'] = int64_feature([x for x in gated_width[key]])
+
         #for idx, point_key in enumerate(self.point_keys):
-        #    feature_dict['lidar/' + point_key] = float_feature(lidar_data[point_key].flatten().tolist())
-        #    feature_dict['lidar/shape/' + point_key] = int64_feature([x for x in lidar_data[point_key].shape])
+            #feature_dict['lidar/encoded'] = float_feature(lidar_data[point_key].flatten().tolist())
+            #feature_dict['lidar/shape'] = int64_feature([x for x in lidar_data[point_key].shape])
         # for idx, radar_key in enumerate(self.radar_keys):
         #     feature_dict['radar/'+radar_key] = float_feature(radar_data[radar_key].flatten().tolist())
         #     feature_dict['radar/shape/'+radar_key] = int64_feature([x for x in radar_data[radar_key].shape])
