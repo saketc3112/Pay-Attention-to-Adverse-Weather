@@ -192,6 +192,9 @@ class TfExampleDecoder(data_decoder.DataDecoder):
     self.keys_to_features = {
         'image/encoded':
             tf.FixedLenFeature((), tf.string, default_value=''),
+        # Changes
+        'gated/encoded':
+            tf.FixedLenFeature((), tf.string, default_value=''),
         'image/format':
             tf.FixedLenFeature((), tf.string, default_value='jpeg'),
         'image/filename':
@@ -254,6 +257,21 @@ class TfExampleDecoder(data_decoder.DataDecoder):
           channels=1,
           repeated=True,
           dct_method=dct_method)
+      # Changes
+      gated = slim_example_decoder.Image(
+          image_key='gated/encoded',
+          format_key='image/format',
+          channels=3,
+          dct_method=dct_method)
+      additional_channel_image = slim_example_decoder.Image(
+          image_key='gated/additional_channels/encoded',
+          format_key='image/format',
+          channels=1,
+          repeated=True,
+          dct_method=dct_method)
+      # Changes 
+      # Combined inputs
+      #image = tf.concat([image,gated],2)
     else:
       image = slim_example_decoder.Image(
           image_key='image/encoded', format_key='image/format', channels=3)
@@ -262,9 +280,24 @@ class TfExampleDecoder(data_decoder.DataDecoder):
           format_key='image/format',
           channels=1,
           repeated=True)
+      # Changes
+      gated = slim_example_decoder.Image(
+          image_key='gated/encoded', format_key='image/format', channels=3)
+      additional_channel_image = slim_example_decoder.Image(
+          image_key='gated/additional_channels/encoded',
+          format_key='image/format',
+          channels=1,
+          repeated=True)
+      # Changes 
+      # Combined inputs
+      #image = tf.concat([image,gated],2)
+
     self.items_to_handlers = {
         fields.InputDataFields.image:
             image,
+        # Changes
+        fields.InputDataFields.image:
+            gated,
         fields.InputDataFields.source_id: (
             slim_example_decoder.Tensor('image/source_id')),
         fields.InputDataFields.key: (
@@ -455,6 +488,9 @@ class TfExampleDecoder(data_decoder.DataDecoder):
       A dictionary of the following tensors.
       fields.InputDataFields.image - 3D uint8 tensor of shape [None, None, 3]
         containing image.
+      # Changes
+      fields.InputDataFields.gated - 3D uint8 tensor of shape [None, None, 3]
+        containing gated image.
       fields.InputDataFields.original_image_spatial_shape - 1D int32 tensor of
         shape [2] containing shape of the image.
       fields.InputDataFields.source_id - string tensor containing original
@@ -510,6 +546,8 @@ class TfExampleDecoder(data_decoder.DataDecoder):
     is_crowd = fields.InputDataFields.groundtruth_is_crowd
     tensor_dict[is_crowd] = tf.cast(tensor_dict[is_crowd], dtype=tf.bool)
     tensor_dict[fields.InputDataFields.image].set_shape([None, None, 3])
+    # Changes
+    tensor_dict[fields.InputDataFields.gated].set_shape([None, None, 3])
     tensor_dict[fields.InputDataFields.original_image_spatial_shape] = tf.shape(
         tensor_dict[fields.InputDataFields.image])[:2]
 

@@ -99,6 +99,7 @@ class InputDataFields(object):
     image_width: width of images, used to decode
   """
   image = 'image'
+  gated = 'gated'
   image_additional_channels = 'image_additional_channels'
   original_image = 'original_image'
   original_image_spatial_shape = 'original_image_spatial_shape'
@@ -306,6 +307,7 @@ class TfExampleFields(object):
   """
   image_encoded = 'image/encoded'
   image_format = 'image/format'  # format is reserved keyword
+  gated_encoded = 'gated/encoded'
   filename = 'image/filename'
   channels = 'image/channels'
   colorspace = 'image/colorspace'
@@ -343,6 +345,7 @@ class TfExampleFields(object):
 # Sequence fields for SequenceExample inputs.
 # All others are considered context fields.
 SEQUENCE_FIELDS = [InputDataFields.image,
+                   InputDataFields.gated,
                    InputDataFields.source_id,
                    InputDataFields.groundtruth_boxes,
                    InputDataFields.num_groundtruth_boxes,
