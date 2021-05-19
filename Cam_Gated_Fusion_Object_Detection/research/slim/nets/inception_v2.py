@@ -1,13 +1,3 @@
-"""
-Simple Fusion is performed with InceptionV2 model. The following line represents 
-the logic of fusion:
-1. Model with Camera Input
-2. Model with Gated Input
-3. Fuse Camera and Gated Model
-4. Final few layers
-"""
-
-
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +28,7 @@ trunc_normal = lambda stddev: tf.truncated_normal_initializer(
     0.0, stddev)
 
 
-def inception_v2_base(inputs,
+def inception_v2_base(inputs_camera, inputs_gated,
                       final_endpoint='Mixed_5c',
                       min_depth=16,
                       depth_multiplier=1.0,
@@ -103,14 +93,15 @@ def inception_v2_base(inputs,
     )
 
   concat_dim = 3 if data_format == 'NHWC' else 1
-  with tf.variable_scope(scope, 'InceptionV2', [inputs]):
+  with tf.variable_scope(scope, 'InceptionV2', [inputs_camera, inputs_gated]):
     with slim.arg_scope(
         [slim.conv2d, slim.max_pool2d, slim.avg_pool2d],
         stride=1,
         padding='SAME',
         data_format=data_format):
 
-      net = inputs
+      net_camera = inputs_camera
+      net_gated = inputs_gated
       if include_root_block:
         # Note that sizes in the comments below assume an input spatial size of
         # 224x224, however, the inputs can be of any size greater 32x32.
@@ -127,8 +118,18 @@ def inception_v2_base(inputs,
           #   in_channels * depthwise_multipler <= out_channels
           # so that the separable convolution is not overparameterized.
           depthwise_multiplier = min(int(depth(64) / 3), 8)
-          net = slim.separable_conv2d(
-              inputs,
+          # Camera model
+          net_camera = slim.separable_conv2d(
+              inputs_camera,
+              depth(64), [7, 7],
+              depth_multiplier=depthwise_multiplier,
+              stride=2,
+              padding='SAME',
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point)
+          # Gated model
+          net_gated = slim.separable_conv2d(
+              inputs_gated,
               depth(64), [7, 7],
               depth_multiplier=depthwise_multiplier,
               stride=2,
@@ -137,40 +138,74 @@ def inception_v2_base(inputs,
               scope=end_point)
         else:
           # Use a normal convolution instead of a separable convolution.
-          net = slim.conv2d(
-              inputs,
+          # Camera Model
+          net_camera = slim.conv2d(
+              inputs_camera,
               depth(64), [7, 7],
               stride=2,
               weights_initializer=trunc_normal(1.0),
               scope=end_point)
+          # Gated model
+          net_gated = slim.conv2d(
+              inputs_gated,
+              depth(64), [7, 7],
+              stride=2,
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point)
+        # Fusion
+        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         end_points[end_point] = net
         if end_point == final_endpoint:
           return net, end_points
         # 112 x 112 x 64
         end_point = 'MaxPool_2a_3x3'
-        net = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Camera model
+        net_camera = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Gated model
+        net_gated = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Fusion
+        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         end_points[end_point] = net
         if end_point == final_endpoint:
           return net, end_points
         # 56 x 56 x 64
         end_point = 'Conv2d_2b_1x1'
-        net = slim.conv2d(
+        # Camera Model
+        net_camera = slim.conv2d(
             net,
             depth(64), [1, 1],
             scope=end_point,
             weights_initializer=trunc_normal(0.1))
+        # Gated model
+        net_gated = slim.conv2d(
+            net,
+            depth(64), [1, 1],
+            scope=end_point,
+            weights_initializer=trunc_normal(0.1))
+        # Fusion
+        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         end_points[end_point] = net
         if end_point == final_endpoint:
           return net, end_points
         # 56 x 56 x 64
         end_point = 'Conv2d_2c_3x3'
-        net = slim.conv2d(net, depth(192), [3, 3], scope=end_point)
+        # Camera Model
+        net_camera = slim.conv2d(net, depth(192), [3, 3], scope=end_point)
+        # Gated Model
+        net_gated = slim.conv2d(net, depth(192), [3, 3], scope=end_point)
+        # Fusion
+        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         end_points[end_point] = net
         if end_point == final_endpoint:
           return net, end_points
         # 56 x 56 x 192
         end_point = 'MaxPool_3a_3x3'
-        net = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Camera Model
+        net_camera = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Gated Model
+        net_gated = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
+        # Fusion
+        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         end_points[end_point] = net
         if end_point == final_endpoint:
           return net, end_points

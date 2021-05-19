@@ -98,7 +98,7 @@ class FasterRCNNInceptionV2FeatureExtractor(
     """
     return (2.0 / 255.0) * resized_inputs - 1.0
 
-  def _extract_proposal_features(self, preprocessed_inputs, scope):
+  def _extract_proposal_features(self, preprocessed_inputs,preprocessed_gated, scope):
     """Extracts first stage RPN features.
 
     Args:
@@ -130,7 +130,7 @@ class FasterRCNNInceptionV2FeatureExtractor(
                                    batch_norm_scale=True,
                                    train_batch_norm=self._train_batch_norm):
           _, activations = inception_v2.inception_v2_base(
-              preprocessed_inputs,
+              preprocessed_inputs,preprocessed_gated,
               final_endpoint='Mixed_4e',
               min_depth=self._min_depth,
               depth_multiplier=self._depth_multiplier,

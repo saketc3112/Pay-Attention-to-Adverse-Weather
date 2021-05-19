@@ -271,7 +271,7 @@ class TfExampleDecoder(data_decoder.DataDecoder):
           dct_method=dct_method)
       # Changes 
       # Combined inputs
-      #image = tf.concat([image,gated],2)
+      image = tf.concat([image,gated],2)
     else:
       image = slim_example_decoder.Image(
           image_key='image/encoded', format_key='image/format', channels=3)
@@ -296,7 +296,7 @@ class TfExampleDecoder(data_decoder.DataDecoder):
         fields.InputDataFields.image:
             image,
         # Changes
-        fields.InputDataFields.image:
+        fields.InputDataFields.gated:
             gated,
         fields.InputDataFields.source_id: (
             slim_example_decoder.Tensor('image/source_id')),
@@ -547,7 +547,7 @@ class TfExampleDecoder(data_decoder.DataDecoder):
     tensor_dict[is_crowd] = tf.cast(tensor_dict[is_crowd], dtype=tf.bool)
     tensor_dict[fields.InputDataFields.image].set_shape([None, None, 3])
     # Changes
-    tensor_dict[fields.InputDataFields.gated].set_shape([None, None, 3])
+    #tensor_dict[fields.InputDataFields.gated].set_shape([None, None, 3])
     tensor_dict[fields.InputDataFields.original_image_spatial_shape] = tf.shape(
         tensor_dict[fields.InputDataFields.image])[:2]
 

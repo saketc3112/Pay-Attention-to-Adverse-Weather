@@ -25,7 +25,7 @@ import tensorflow.compat.v1 as tf
 from object_detection import model_lib
 
 flags.DEFINE_string(
-    '/training', None, 'Path to output model directory '
+    'model_dir', None, 'Path to output model directory '
     'where event and checkpoint files will be written.')
 flags.DEFINE_string('pipeline_config_path', None, 'Path to pipeline config '
                     'file.')

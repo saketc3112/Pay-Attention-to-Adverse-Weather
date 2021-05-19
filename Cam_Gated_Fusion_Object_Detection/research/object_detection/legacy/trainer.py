@@ -64,6 +64,14 @@ def create_input_queue(batch_size_per_clone, create_tensor_dict_fn,
   float_images = tf.cast(images, dtype=tf.float32)
   tensor_dict[fields.InputDataFields.image] = float_images
 
+  # Changes
+  # Gated 
+  tensor_dict[fields.InputDataFields.gated] = tf.expand_dims(
+                tensor_dict[fields.InputDataFields.gated], 0)
+  gated_images = tensor_dict[fields.InputDataFields.gated]
+  float_gated_images = tf.cast(gated_images, dtype=tf.float32)
+  tensor_dict[fields.InputDataFields.gated] = float_gated_images
+
   include_instance_masks = (fields.InputDataFields.groundtruth_instance_masks
                             in tensor_dict)
   include_keypoints = (fields.InputDataFields.groundtruth_keypoints
@@ -125,6 +133,9 @@ def get_inputs(input_queue,
   def extract_images_and_targets(read_data):
     """Extract images and targets from the input dict."""
     image = read_data[fields.InputDataFields.image]
+
+    # Changes
+    gated = read_data[fields.InputDataFields.gated]
     key = ''
     if fields.InputDataFields.source_id in read_data:
       key = read_data[fields.InputDataFields.source_id]
@@ -156,7 +167,9 @@ def get_inputs(input_queue,
       raise NotImplementedError('Multi-label support is only for boxes.')
     weights_gt = read_data.get(
         fields.InputDataFields.groundtruth_weights)
-    return (image, key, location_gt, classes_gt, masks_gt, keypoints_gt,
+
+    # Changes
+    return (image, gated, key, location_gt, classes_gt, masks_gt, keypoints_gt,
             weights_gt)
 
   return zip(*map(extract_images_and_targets, read_data_list))
@@ -171,7 +184,10 @@ def _create_losses(input_queue, create_model_fn, train_config):
     train_config: a train_pb2.TrainConfig protobuf.
   """
   detection_model = create_model_fn()
-  (images, _, groundtruth_boxes_list, groundtruth_classes_list,
+  #detection_model_gated = create_model_fn()
+
+  # Changes
+  (images,gated, _, groundtruth_boxes_list, groundtruth_classes_list,
    groundtruth_masks_list, groundtruth_keypoints_list,
    groundtruth_weights_list) = get_inputs(
        input_queue,
@@ -179,6 +195,11 @@ def _create_losses(input_queue, create_model_fn, train_config):
        train_config.merge_multiple_label_boxes,
        train_config.use_multiclass_scores)
 
+  # Checkpoint
+  print("............................Checkpoint 1...............................................................")
+  print("Camera Images:", images)
+  print("Gated Images:", gated)
+   
   preprocessed_images = []
   true_image_shapes = []
   for image in images:
@@ -186,8 +207,27 @@ def _create_losses(input_queue, create_model_fn, train_config):
     preprocessed_images.append(resized_image)
     true_image_shapes.append(true_image_shape)
 
+  # Checkpoint 2
+  print("............................Checkpoint 2.............................................................")
+  print("Camera PreProc image:", preprocessed_images)
+  print("Camera true_image_shapes:", true_image_shapes)
+
   images = tf.concat(preprocessed_images, 0)
   true_image_shapes = tf.concat(true_image_shapes, 0)
+  # Checkpoint 3
+  print("...........................Checkpoint 3.............................................................")
+  print("Camera Image:", images)
+  # Changes
+  # Gated
+  preprocessed_gated_images = []
+  true_gated_image_shapes = []
+  for image in gated:
+      resized_image, true_image_shape = detection_model.preprocess(image)
+      preprocessed_gated_images.append(resized_image)
+      true_gated_image_shapes.append(true_image_shape)
+
+  gated = tf.concat(preprocessed_gated_images, 0)
+  true_gated_image_shapes = tf.concat(true_gated_image_shapes, 0)
 
   if any(mask is None for mask in groundtruth_masks_list):
     groundtruth_masks_list = None
@@ -200,12 +240,26 @@ def _create_losses(input_queue, create_model_fn, train_config):
       groundtruth_masks_list,
       groundtruth_keypoints_list,
       groundtruth_weights_list=groundtruth_weights_list)
-  prediction_dict = detection_model.predict(images, true_image_shapes)
+  # Changes Gated
+  detection_model.provide_groundtruth(
+      groundtruth_boxes_list,
+      groundtruth_classes_list,
+      groundtruth_masks_list,
+      groundtruth_keypoints_list,
+      groundtruth_weights_list=groundtruth_weights_list)
 
+
+  #prediction_dict = detection_model.predict(images, true_image_shapes)
+  # Changes
+  # Gated
+  prediction_dict = detection_model.predict(images, gated, true_gated_image_shapes)
+
+  # Loss
   losses_dict = detection_model.loss(prediction_dict, true_image_shapes)
   for loss_tensor in losses_dict.values():
     tf.losses.add_loss(loss_tensor)
-
+  # Changes
+  # Loss for Gated
 
 def train(create_tensor_dict_fn,
           create_model_fn,
@@ -278,6 +332,7 @@ def train(create_tensor_dict_fn,
           train_config.num_batch_queue_threads,
           train_config.prefetch_queue_capacity, data_augmentation_options)
 
+      
     # Gather initial summaries.
     # TODO(rathodv): See if summaries can be added/extracted from global tf
     # collections so that they don't have to be passed around.
@@ -289,7 +344,11 @@ def train(create_tensor_dict_fn,
                                  train_config=train_config)
     clones = model_deploy.create_clones(deploy_config, model_fn, [input_queue])
     first_clone_scope = clones[0].scope
-
+    
+    # Checkpoint 4
+    print("==============================Checkpoint 4===============================================")
+    print("Input Queue:", input_queue)
+    
     if graph_hook_fn:
       with tf.device(deploy_config.variables_device()):
         graph_hook_fn()

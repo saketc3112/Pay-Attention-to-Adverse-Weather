@@ -148,7 +148,7 @@ class FasterRCNNFeatureExtractor(object):
     """Feature-extractor specific preprocessing (minus image resizing)."""
     pass
 
-  def extract_proposal_features(self, preprocessed_inputs, scope):
+  def extract_proposal_features(self, preprocessed_inputs,preprocessed_gated, scope):
     """Extracts first stage RPN features.
 
     This function is responsible for extracting feature maps from preprocessed
@@ -165,10 +165,10 @@ class FasterRCNNFeatureExtractor(object):
       activations: A dictionary mapping activation tensor names to tensors.
     """
     with tf.variable_scope(scope, values=[preprocessed_inputs]):
-      return self._extract_proposal_features(preprocessed_inputs, scope)
+      return self._extract_proposal_features(preprocessed_inputs,preprocessed_gated, scope)
 
   @abc.abstractmethod
-  def _extract_proposal_features(self, preprocessed_inputs, scope):
+  def _extract_proposal_features(self, preprocessed_inputs,preprocessed_gated, scope):
     """Extracts first stage RPN features, to be overridden."""
     pass
 
@@ -729,7 +729,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
             anchors, image_shape_2d, true_image_shapes)
     return proposal_boxes_normalized, num_proposals
 
-  def predict(self, preprocessed_inputs, true_image_shapes, **side_inputs):
+  def predict(self, preprocessed_inputs,preprocessed_gated, true_image_shapes, **side_inputs):
     """Predicts unpostprocessed tensors from input tensor.
 
     This function takes an input batch of images and runs it through the
@@ -817,7 +817,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     Raises:
       ValueError: If `predict` is called before `preprocess`.
     """
-    prediction_dict = self._predict_first_stage(preprocessed_inputs)
+    prediction_dict = self._predict_first_stage(preprocessed_inputs,preprocessed_gated)
 
     if self._number_of_stages >= 2:
       prediction_dict.update(
@@ -838,7 +838,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     ]
     return prediction_dict
 
-  def _predict_first_stage(self, preprocessed_inputs):
+  def _predict_first_stage(self, preprocessed_inputs,preprocessed_gated):
     """First stage of prediction.
 
     Args:
@@ -871,7 +871,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
           features to crop.
     """
     (rpn_box_predictor_features, rpn_features_to_crop, anchors_boxlist,
-     image_shape) = self._extract_rpn_feature_maps(preprocessed_inputs)
+     image_shape) = self._extract_rpn_feature_maps(preprocessed_inputs,preprocessed_gated)
     (rpn_box_encodings, rpn_objectness_predictions_with_background
     ) = self._predict_rpn_proposals(rpn_box_predictor_features)
 
@@ -1291,7 +1291,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     gather_idx = tf.range(k) * num_classes + classes
     return tf.gather(instance_masks, gather_idx)
 
-  def _extract_rpn_feature_maps(self, preprocessed_inputs):
+  def _extract_rpn_feature_maps(self, preprocessed_inputs,preprocessed_gated):
     """Extracts RPN features.
 
     This function extracts two feature maps: a feature map to be directly
@@ -1316,7 +1316,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     image_shape = tf.shape(preprocessed_inputs)
 
     rpn_features_to_crop, self.endpoints = self._extract_proposal_features(
-        preprocessed_inputs)
+        preprocessed_inputs,preprocessed_gated)
 
     # Decide if rpn_features_to_crop is a list. If not make it a list
     if not isinstance(rpn_features_to_crop, list):
@@ -1336,7 +1336,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     return (rpn_box_predictor_features, rpn_features_to_crop,
             anchors, image_shape)
 
-  def _extract_proposal_features(self, preprocessed_inputs):
+  def _extract_proposal_features(self, preprocessed_inputs,preprocessed_gated):
     if self._feature_extractor_for_proposal_features == (
         _UNINITIALIZED_FEATURE_EXTRACTOR):
       self._feature_extractor_for_proposal_features = (
@@ -1349,7 +1349,7 @@ class FasterRCNNMetaArch(model.DetectionModel):
     else:
       proposal_features = (
           self._feature_extractor.extract_proposal_features(
-              preprocessed_inputs,
+              preprocessed_inputs,preprocessed_gated,
               scope=self.first_stage_feature_extractor_scope))
     return proposal_features
 
