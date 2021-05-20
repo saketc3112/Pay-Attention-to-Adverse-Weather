@@ -82,9 +82,15 @@ def _extract_predictions_and_losses(model,
   prefetch_queue = prefetcher.prefetch(input_dict, capacity=500)
   input_dict = prefetch_queue.dequeue()
   original_image = tf.expand_dims(input_dict[fields.InputDataFields.image], 0)
+  # Changes
+  original_gated = tf.expand_dims(input_dict[fields.InputDataFields.gated], 0)
   preprocessed_image, true_image_shapes = model.preprocess(
       tf.cast(original_image, dtype=tf.float32))
-  prediction_dict = model.predict(preprocessed_image, true_image_shapes)
+  # Changes
+  preprocessed_gated, true_gated_shapes = model.preprocess(
+      tf.cast(original_gated, dtype=tf.float32))
+  # Changes
+  prediction_dict = model.predict(preprocessed_image,preprocessed_gated, true_image_shapes)
   detections = model.postprocess(prediction_dict, true_image_shapes)
 
   groundtruth = None

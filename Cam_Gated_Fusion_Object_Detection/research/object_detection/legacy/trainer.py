@@ -197,8 +197,8 @@ def _create_losses(input_queue, create_model_fn, train_config):
 
   # Checkpoint
   print("............................Checkpoint 1...............................................................")
-  print("Camera Images:", images)
-  print("Gated Images:", gated)
+  print("Camera Images:", tf.shape(images))
+  print("Gated Images:", tf.shape(gated))
    
   preprocessed_images = []
   true_image_shapes = []
@@ -209,14 +209,14 @@ def _create_losses(input_queue, create_model_fn, train_config):
 
   # Checkpoint 2
   print("............................Checkpoint 2.............................................................")
-  print("Camera PreProc image:", preprocessed_images)
-  print("Camera true_image_shapes:", true_image_shapes)
+  print("Camera PreProc image:", tf.shape(preprocessed_images))
+  print("Camera true_image_shapes:", tf.shape(true_image_shapes))
 
   images = tf.concat(preprocessed_images, 0)
   true_image_shapes = tf.concat(true_image_shapes, 0)
   # Checkpoint 3
   print("...........................Checkpoint 3.............................................................")
-  print("Camera Image:", images)
+  print("Camera Image:", tf.shape(images))
   # Changes
   # Gated
   preprocessed_gated_images = []
@@ -252,7 +252,7 @@ def _create_losses(input_queue, create_model_fn, train_config):
   #prediction_dict = detection_model.predict(images, true_image_shapes)
   # Changes
   # Gated
-  prediction_dict = detection_model.predict(images, gated, true_gated_image_shapes)
+  prediction_dict = detection_model.predict(images, gated, true_image_shapes)
 
   # Loss
   losses_dict = detection_model.loss(prediction_dict, true_image_shapes)

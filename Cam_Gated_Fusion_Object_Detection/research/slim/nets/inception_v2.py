@@ -74,6 +74,14 @@ def inception_v2_base(inputs_camera, inputs_gated,
     ValueError: if final_endpoint is not set to one of the predefined values,
                 or depth_multiplier <= 0
   """
+        # Checkpoint
+  print("=============================Checkpoint Train Images============================================")
+  print("Camera shape:",inputs_camera)
+  print("Gated shape:",inputs_gated)
+
+  # Input Resize
+  #inputs_image = tf.reshape(inputs_image, shape=[224,224, 3])
+  #inputs_gated = tf.reshape(inputs_gated, shape=[224,224, 3])
 
   # end_points will collect relevant activations for external use, for example
   # summaries or losses.
@@ -108,6 +116,7 @@ def inception_v2_base(inputs_camera, inputs_gated,
 
         # 224 x 224 x 3
         end_point = 'Conv2d_1a_7x7'
+        
 
         if use_separable_conv:
           # depthwise_multiplier here is different from depth_multiplier.
