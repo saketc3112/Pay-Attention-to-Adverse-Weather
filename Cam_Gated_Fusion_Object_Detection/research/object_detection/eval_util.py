@@ -663,8 +663,8 @@ def _scale_keypoint_to_absolute(args):
   keypoints, image_shape = args
   return keypoint_ops.scale(keypoints, image_shape[0], image_shape[1])
 
-
-def result_dict_for_single_example(image,
+# Changes
+def result_dict_for_single_example(image,gated,
                                    key,
                                    detections,
                                    groundtruth=None,
@@ -736,35 +736,55 @@ def result_dict_for_single_example(image,
   for detection_key in detections:
     detections[detection_key] = tf.expand_dims(
         detections[detection_key][0], axis=0)
-
+  # Changes
   batched_output_dict = result_dict_for_batched_example(
-      image,
+      image,gated,
       tf.expand_dims(key, 0),
       detections,
       groundtruth,
       class_agnostic,
       scale_to_absolute,
       max_gt_boxes=max_gt_boxes)
-
+  # Changes
+  #batched_output_dict_gated = result_dict_for_batched_example(
+  #    gated,
+  #    tf.expand_dims(key, 0),
+  #    detections,
+  #    groundtruth,
+  #    class_agnostic,
+  #    scale_to_absolute,
+  #    max_gt_boxes=max_gt_boxes)
   exclude_keys = [
       fields.InputDataFields.original_image,
+      # Changes
+      fields.InputDataFields.original_gated,
       fields.DetectionResultFields.num_detections,
       fields.InputDataFields.num_groundtruth_boxes
   ]
 
   output_dict = {
       fields.InputDataFields.original_image:
-          batched_output_dict[fields.InputDataFields.original_image]
-  }
+          batched_output_dict[fields.InputDataFields.original_image],
+  # Changes
+     fields.InputDataFields.original_gated:
+          batched_output_dict[fields.InputDataFields.original_gated]
+          }
 
   for key in batched_output_dict:
     # remove the batch dimension.
     if key not in exclude_keys:
       output_dict[key] = tf.squeeze(batched_output_dict[key], 0)
+
+  # Changes
+  #for key in batched_output_dict_gated:
+    # remove the batch dimension.
+  #  if key not in exclude_keys:
+  #    output_dict[key] = tf.squeeze(batched_output_dict_gated[key], 0)
+  
   return output_dict
 
 
-def result_dict_for_batched_example(images,
+def result_dict_for_batched_example(images,gated,
                                     keys,
                                     detections,
                                     groundtruth=None,
@@ -908,6 +928,9 @@ def result_dict_for_batched_example(images,
   output_dict = {
       input_data_fields.original_image:
           images,
+    # Changes
+      input_data_fields.original_gated:
+          gated,
       input_data_fields.key:
           keys,
       input_data_fields.original_image_spatial_shape: (

@@ -132,7 +132,7 @@ def _extract_predictions_and_losses(model,
     losses_dict.update(model.loss(prediction_dict, true_image_shapes))
 
   result_dict = eval_util.result_dict_for_single_example(
-      original_image,
+      original_image,original_gated,
       input_dict[fields.InputDataFields.source_id],
       detections,
       groundtruth,
