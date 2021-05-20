@@ -380,12 +380,17 @@ class SwedenImagesv2(ExampleCreator):
         for folder in self.gated_keys:
             file_path = os.path.join(self.source_dir, folder, entry_id + '.png')
             feature = open(file_path, 'rb').read()
-            img = PIL.Image.open(file_path, mode="r")
-            img_width, img_height = img.size
+            #img = PIL.Image.open(file_path, mode="r")
+            img = PIL.Image.open(file_path)
+            img = img.resize((1920, 1024), PIL.Image.ANTIALIAS).convert('RGB')
+            img.save('/home/saket/Dense/gated_resized.png')
+            saveto = '/home/saket/Dense/gated_resized.png'
+            feature = open(saveto, 'rb').read()
             gated_images[folder] = feature
-            gated_images_shape[folder] = ([img_height, img_width, 3])
-            gated_images_height[folder] = ([img_height])
-            gated_images_width[folder] = ([img_width])
+            #img_width, img_height = img.size
+            gated_images_shape[folder] = ([1920, 1024, 3])
+            gated_images_height[folder] = ([1920])
+            gated_images_width[folder] = ([1024])
 
 
         o = self.proces_label(entry_id, dist_images_shape[self.image_keys[0]])
