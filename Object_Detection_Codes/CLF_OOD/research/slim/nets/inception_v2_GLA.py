@@ -314,36 +314,36 @@ def inception_v2_base(inputs_camera, inputs_gated,
             axis=concat_dim, values=[branch_0_gated, branch_1_gated, branch_2_gated, branch_3_gated])
         # *********
         # Fusion
-        net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
+        #net = tf.concat(axis=concat_dim, values=[net_camera, net_gated])
         # Fusion
         # Inputs
-        #inputs = net_camera + net_gated
+        inputs = net_camera + net_gated
 
         # Local Attribute
-        #net_local = slim.conv2d(inputs, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
-        #net_local = slim.batch_norm(net_local)
-        #net_local = slim.conv2d(net_local, 16, [1, 1], activation_fn=tf.nn.relu)
+        net_local = slim.conv2d(inputs, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
+        net_local = slim.batch_norm(net_local)
+        net_local = slim.conv2d(net_local, 16, [1, 1], activation_fn=tf.nn.relu)
     #net_local = slim.conv2d(net_local, 64, [1, 1],stride=1,weights_initializer=trunc_normal(1.0),scope=end_point)
-        #net_local = slim.batch_norm(net_local)
+        net_local = slim.batch_norm(net_local)
 
         # Global Attribute
         # Global average pooling.
-        #net_global = tf.reduce_mean(input_tensor=inputs, axis=[1, 2], keepdims=True)
-        #net_global = slim.avg_pool2d(inputs, [1,1], stride=2)
-        #net_global = slim.conv2d(net_global, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
-        #net_global = slim.batch_norm(net_global)
-        #net_global = slim.conv2d(net_global, 16, [1, 1], activation_fn=tf.nn.relu)
+        net_global = tf.reduce_mean(input_tensor=inputs, axis=[1, 2], keepdims=True)
+        net_global = slim.avg_pool2d(inputs, [1,1], stride=2)
+        net_global = slim.conv2d(net_global, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
+        net_global = slim.batch_norm(net_global)
+        net_global = slim.conv2d(net_global, 16, [1, 1], activation_fn=tf.nn.relu)
     #net_global = slim.conv2d(net_global,depth(16), [1, 1],stride=1,weights_initializer=trunc_normal(1.0),scope=end_point)
-        #net_global = slim.batch_norm(net_global)
+        net_global = slim.batch_norm(net_global)
 
         # Combine Global Local Attributes and Calculating Weights
-        #net = net_local + net_global
-        #net = tf.concat(axis=concat_dim, values=[net_global + net_local])
-        #weights = slim.conv2d(net, 1, [1, 1], activation_fn=tf.nn.sigmoid)
+        net = net_local + net_global
+        net = tf.concat(axis=concat_dim, values=[net_global + net_local])
+        weights = slim.conv2d(net, 1, [1, 1], activation_fn=tf.nn.sigmoid)
         
         # Weighted Fusion
         #net = 2*branch_0 + 2*branch_1
-        #net = 2*net_camera*weights + 2*net_gated*(1 - weights)
+        net = 2*net_camera*weights + 2*net_gated*(1 - weights)
         
         end_points[end_point] = net
         if end_point == final_endpoint: return net, end_points
