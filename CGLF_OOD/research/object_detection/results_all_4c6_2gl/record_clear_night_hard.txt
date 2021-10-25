@@ -1,0 +1,40 @@
+WARNING:tensorflow:From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py:258: main (from __main__) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use object_detection/model_main.py.
+W1021 19:02:00.084022 140326211290944 deprecation.py:323] From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py:258: main (from __main__) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use object_detection/model_main.py.
+INFO:tensorflow:Reading unweighted datasets: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_clear_camera_gated_lidar_night_4c_dbh/test_clear_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+I1021 19:02:00.116639 140326211290944 dataset_builder.py:163] Reading unweighted datasets: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_clear_camera_gated_lidar_night_4c_dbh/test_clear_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+Traceback (most recent call last):
+  File "eval.py", line 142, in <module>
+    tf.app.run()
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/platform/app.py", line 40, in run
+    _run(main=main, argv=argv, flags_parser=_parse_flags_tolerate_undef)
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py", line 312, in run
+    _run_main(main, args)
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py", line 258, in _run_main
+    sys.exit(main(argv))
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/util/deprecation.py", line 324, in new_func
+    return func(*args, **kwargs)
+  File "eval.py", line 138, in main
+    graph_hook_fn=graph_rewriter_fn)
+  File "/home/saket/Dense/CGLF_OOD/research/object_detection/legacy/evaluator.py", line 215, in evaluate
+    ignore_groundtruth=eval_config.ignore_groundtruth)
+  File "/home/saket/Dense/CGLF_OOD/research/object_detection/legacy/evaluator.py", line 81, in _extract_predictions_and_losses
+    input_dict = create_input_dict_fn()
+  File "eval.py", line 116, in get_next
+    dataset_builder.build(config)).get_next()
+  File "/home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py", line 246, in build
+    config.input_path[:], input_reader_config, filename_shard_fn=shard_fn)
+  File "/home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py", line 165, in read_dataset
+    config.num_readers, config, filename_shard_fn)
+  File "/home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py", line 79, in _read_dataset_internal
+    filenames = tf.gfile.Glob(input_files)
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/lib/io/file_io.py", line 363, in get_matching_files
+    return get_matching_files_v2(filename)
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/lib/io/file_io.py", line 390, in get_matching_files_v2
+    for single_filename in pattern
+  File "/home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/lib/io/file_io.py", line 392, in <listcomp>
+    compat.as_bytes(single_filename))
+tensorflow.python.framework.errors_impl.NotFoundError: /data/datasets/saket/SeeingThroughFogData/new_data/test_clear_camera_gated_lidar_night_4c_dbh; No such file or directory
