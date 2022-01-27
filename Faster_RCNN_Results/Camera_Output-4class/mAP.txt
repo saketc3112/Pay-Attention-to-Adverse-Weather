@@ -1,5 +1,0 @@
-62.44 mAP 10k steps
-
-68.09 mAP 14k steps
-
-66 mAP 20k steps
