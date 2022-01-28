@@ -27,40 +27,8 @@ from nets import inception_utils
 trunc_normal = lambda stddev: tf.truncated_normal_initializer(
     0.0, stddev)
 
-# Global Local Attention Fusion Block
-def GLA(layer1, layer2):
-    #end_points = {}
-    # Inputs
-    inputs = layer1 + layer2
 
-    # Local Attribute
-    net_local = slim.conv2d(inputs, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
-    net_local = slim.batch_norm(net_local)
-    net_local = slim.conv2d(net_local, 16, [1, 1], activation_fn=tf.nn.sigmoid)
-    #net_local = slim.conv2d(net_local, 64, [1, 1],stride=1,weights_initializer=trunc_normal(1.0),scope=end_point)
-    net_local = slim.batch_norm(net)
-
-    # Global Attribute
-    # Global average pooling.
-    #net = tf.reduce_mean(input_tensor=net, axis=[1, 2], keepdims=True, name='global_pool')
-    net_global = slim.avg_pool2d(inputs, [1,1], stride=2)
-    net_global = slim.conv2d(net_global, 16, [1, 1],stride=1,weights_initializer=trunc_normal(1.0))
-    net_global = slim.batch_norm(net_global)
-    net_global = slim.conv2d(net_global, 16, [1, 1], activation_fn=tf.nn.sigmoid)
-    #net_global = slim.conv2d(net_global,depth(16), [1, 1],stride=1,weights_initializer=trunc_normal(1.0),scope=end_point)
-    net_global = slim.batch_norm(net_global)
-
-    # Combine Global Local Attributes and Calculating Weights
-    net = net_global + net_local
-    weights = slim.conv2d(net_local, 2, [1, 1], activation_fn=tf.nn.sigmoid)
-
-    # Weighted Fusion
-    fused_layer = 2 * layer1 * weights + 2 * layer2 * (1 - weights)
-
-    return fused_layer
-
-
-def inception_v2_base(inputs_camera, inputs_gated, inputs_lidar, 
+def inception_v2_base(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy, 
                       final_endpoint='Mixed_5c',
                       min_depth=16,
                       depth_multiplier=1.0,
@@ -104,8 +72,7 @@ def inception_v2_base(inputs_camera, inputs_gated, inputs_lidar,
 
   Raises:
     ValueError: if final_endpoint is not set to one of the predefined values,
-                or depth_multiplier <= 0
-  """
+                or depth_multiplier <= 0"""
         # Checkpoint
   print("=============================Checkpoint Train Images============================================")
   print("Camera shape:",inputs_camera)
@@ -877,7 +844,7 @@ def inception_v2_base(inputs_camera, inputs_gated, inputs_lidar,
         if end_point == final_endpoint: return net, end_points
     raise ValueError('Unknown final endpoint %s' % final_endpoint)
 
-def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
+def inception_v2_base_ssd_p1(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
                       final_endpoint='Mixed_5c',
                       min_depth=16,
                       depth_multiplier=1.0,
@@ -945,7 +912,7 @@ def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
         padding='SAME',
         data_format=data_format):
 
-      net = inputs_camera
+      net_camera = inputs_camera
       if include_root_block:
         # Note that sizes in the comments below assume an input spatial size of
         # 224x224, however, the inputs can be of any size greater 32x32.
@@ -962,7 +929,7 @@ def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
           #   in_channels * depthwise_multipler <= out_channels
           # so that the separable convolution is not overparameterized.
           depthwise_multiplier = min(int(depth(64) / 3), 8)
-          net = slim.separable_conv2d(
+          net_camera = slim.separable_conv2d(
               inputs_camera,
               depth(64), [7, 7],
               depth_multiplier=depthwise_multiplier,
@@ -970,45 +937,90 @@ def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
               padding='SAME',
               weights_initializer=trunc_normal(1.0),
               scope=end_point)
+          net_gated = slim.separable_conv2d(
+              inputs_gated,
+              depth(64), [7, 7],
+              depth_multiplier=depthwise_multiplier,
+              stride=2,
+              padding='SAME',
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point+'_Gated')
+          net_lidar = slim.separable_conv2d(
+              inputs_lidar,
+              depth(64), [7, 7],
+              depth_multiplier=depthwise_multiplier,
+              stride=2,
+              padding='SAME',
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point+'_Lidar')
         else:
           # Use a normal convolution instead of a separable convolution.
-          net = slim.conv2d(
+          net_camera = slim.conv2d(
               inputs_camera,
               depth(64), [7, 7],
               stride=2,
               weights_initializer=trunc_normal(1.0),
               scope=end_point)
-        end_points[end_point] = net
+          net_gated = slim.conv2d(
+              inputs_gated,
+              depth(64), [7, 7],
+              stride=2,
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point+'_Gated')
+          net_lidar = slim.conv2d(
+              inputs_lidar,
+              depth(64), [7, 7],
+              stride=2,
+              weights_initializer=trunc_normal(1.0),
+              scope=end_point+'_Lidar')
+        #net = net_camera
+        end_points[end_point] = net_camera
         if end_point == final_endpoint:
-          return net, end_points
+          return net_camera, end_points
         # 112 x 112 x 64
         end_point = 'MaxPool_2a_3x3'
-        net = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
-        end_points[end_point] = net
+        net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point, stride=2)
+        net_gated = slim.max_pool2d(net_gated, [3, 3], scope=end_point+'_Gated', stride=2)
+        net_lidar = slim.max_pool2d(net_lidar, [3, 3], scope=end_point+'_Lidar', stride=2)
+        end_points[end_point] = net_camera
         if end_point == final_endpoint:
-          return net, end_points
+          return net_camera, end_points
         # 56 x 56 x 64
         end_point = 'Conv2d_2b_1x1'
-        net = slim.conv2d(
-            net,
+        net_camera = slim.conv2d(
+            net_camera,
             depth(64), [1, 1],
             scope=end_point,
             weights_initializer=trunc_normal(0.1))
-        end_points[end_point] = net
+        net_gated = slim.conv2d(
+            net_gated,
+            depth(64), [1, 1],
+            scope=end_point+'_Gated',
+            weights_initializer=trunc_normal(0.1))
+        net_lidar = slim.conv2d(
+            net_lidar,
+            depth(64), [1, 1],
+            scope=end_point+'_Lidar',
+            weights_initializer=trunc_normal(0.1))
+        end_points[end_point] = net_camera
         if end_point == final_endpoint:
-          return net, end_points
+          return net_camera, end_points
         # 56 x 56 x 64
         end_point = 'Conv2d_2c_3x3'
-        net = slim.conv2d(net, depth(192), [3, 3], scope=end_point)
-        end_points[end_point] = net
+        #net_camera = slim.conv2d(net_camera, depth(192), [3, 3], scope=end_point)
+        #net_gated = slim.conv2d(net_gated, depth(192), [3, 3], scope=end_point+'_Gated')
+        #net_lidar = slim.conv2d(net_lidar, depth(192), [3, 3], scope=end_point+'_Lidar')
+        end_points[end_point] = net_camera
         if end_point == final_endpoint:
-          return net, end_points
+          return net_camera, end_points
         # 56 x 56 x 192
         end_point = 'MaxPool_3a_3x3'
-        net = slim.max_pool2d(net, [3, 3], scope=end_point, stride=2)
-        end_points[end_point] = net
+        #net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point, stride=2)
+        #net_gated = slim.max_pool2d(net_gated, [3, 3], scope=end_point+'_Gated', stride=2)
+        #net_lidar = slim.max_pool2d(net_lidar, [3, 3], scope=end_point+'_Lidar', stride=2)
+        end_points[end_point] = net_camera
         if end_point == final_endpoint:
-          return net, end_points
+          return net_camera, end_points
 
       # 28 x 28 x 192
       # Inception module.
@@ -1312,7 +1324,7 @@ def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
         if end_point == final_endpoint: return net, end_points
     raise ValueError('Unknown final endpoint %s' % final_endpoint)
 
-def inception_v2_base_ssd(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
+def inception_v2_base_ssd_p(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
                       final_endpoint='Mixed_5c',
                       min_depth=16,
                       depth_multiplier=1.0,
@@ -1380,7 +1392,9 @@ def inception_v2_base_ssd(inputs_camera, inputs_gated, inputs_lidar, inputs_came
         padding='SAME',
         data_format=data_format):
 
-      net = inputs_camera
+      net_camera = inputs_camera
+      net_gated = net_gated
+      net_lidar = net_lidar
       if include_root_block:
         # Note that sizes in the comments below assume an input spatial size of
         # 224x224, however, the inputs can be of any size greater 32x32.
@@ -1791,7 +1805,7 @@ def inception_v2_base_ssd(inputs_camera, inputs_gated, inputs_lidar, inputs_came
         if end_point == final_endpoint: return net, end_points
     raise ValueError('Unknown final endpoint %s' % final_endpoint)
 
-def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
+def inception_v2_base_ssd(inputs_camera, inputs_gated, inputs_lidar, inputs_camera_entropy, inputs_gated_entropy, inputs_lidar_entropy,
                       final_endpoint='Mixed_5c',
                       min_depth=16,
                       depth_multiplier=1.0,
@@ -1859,7 +1873,9 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
         padding='SAME',
         data_format=data_format):
 
-      net = inputs_camera
+      net_camera = inputs_camera
+      net_gated = inputs_gated
+      net_lidar = inputs_lidar
       if include_root_block:
         # Note that sizes in the comments below assume an input spatial size of
         # 224x224, however, the inputs can be of any size greater 32x32.
@@ -1947,7 +1963,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
           return net_camera, end_points
         # 112 x 112 x 64
         end_point = 'MaxPool_2a_3x3'
-        net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point, stride=2)
+        #net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point, stride=2)
         #net_gated = slim.max_pool2d(net_gated, [3, 3], scope=end_point, stride=2)
         #net_lidar = slim.max_pool2d(net_lidar, [3, 3], scope=end_point, stride=2)
         end_points[end_point] = net_camera
@@ -1983,8 +1999,8 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
           return net_camera, end_points
         # 56 x 56 x 192
         end_point = 'MaxPool_3a_3x3'
-        net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point+'_Camera', stride=2)
-        """net_camera_entropy = slim.conv2d(inputs_camera_entropy, 192, [3, 3],stride=2)
+        #net_camera = slim.max_pool2d(net_camera, [3, 3], scope=end_point+'_Camera', stride=2)
+        net_camera_entropy = slim.conv2d(inputs_camera_entropy, 192, [3, 3],stride=2)
         net_camera_weights = tf.nn.sigmoid(net_camera_entropy)
    #     net_camera = tf.keras.layers.UpSampling2D(size=(2,2))(net_camera)
         net_camera = net_camera*net_camera_weights
@@ -1999,7 +2015,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
 #        net_lidar = tf.keras.layers.UpSampling2D(size=(2,2))(net_lidar)
         net_lidar = net_lidar*net_lidar_weights #(256,256,3)
         # Fusion
-        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar])"""
+        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar])
         net = net_camera
         end_points[end_point] = net
         if end_point == final_endpoint:
@@ -2035,7 +2051,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
               scope='Conv2d_0b_1x1_Camera')
         net_camera = tf.concat(
             axis=concat_dim, values=[branch_0_camera, branch_1_camera, branch_2_camera, branch_3_camera])
-        """net_camera_entropy = slim.conv2d(inputs_camera_entropy, 256, [3, 3],stride=2, scope='Block2_Camera')
+        net_camera_entropy = slim.conv2d(inputs_camera_entropy, 256, [3, 3],stride=2, scope='Block2_Camera')
         net_camera_weights = tf.nn.sigmoid(net_camera_entropy)
         #net_camera = tf.keras.layers.UpSampling2D(size=(2,2))(net_camera)
         net_camera = net_camera*net_camera_weights
@@ -2105,7 +2121,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
         net_lidar = net_lidar*net_lidar_weights
 
         # Fusion
-        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar])"""
+        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar])
         net = net_camera
         end_points[end_point] = net
         if end_point == final_endpoint: return net, end_points
@@ -2138,7 +2154,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
               scope='Conv2d_0b_1x1_camera')
         net_camera = tf.concat(
             axis=concat_dim, values=[branch_0_camera, branch_1_camera, branch_2_camera, branch_3_camera])
-        """net_camera_entropy = slim.conv2d(inputs_camera_entropy, 320, [3, 3],stride=2, scope='Block3_Camera')
+        net_camera_entropy = slim.conv2d(inputs_camera_entropy, 320, [3, 3],stride=2, scope='Block3_Camera')
         net_camera_weights = tf.nn.sigmoid(net_camera_entropy)
         #net_camera = tf.keras.layers.UpSampling2D(size=(2,2))(net_camera)
         net_camera = net_camera*net_camera_weights
@@ -2208,7 +2224,7 @@ def inception_v2_base_ssd_n(inputs_camera, inputs_gated, inputs_lidar, inputs_ca
         net_lidar = net_lidar*net_lidar_weights
 
         # Fusion
-        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar])"""        
+        net = tf.concat(axis=concat_dim, values = [net_camera, net_gated, net_lidar]) 
         net = net_camera
         end_points[end_point] = net
         if end_point == final_endpoint: return net, end_points
