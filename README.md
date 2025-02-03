@@ -20,6 +20,11 @@ The contents of the repository:
 5. 'splits' contains training, validation dataset splits provided in SeeingThroughFog paper.
 
 
+## Contributions
+
+This repository has been developed for multimodal fusion from the open source repository [Tensoflow Object Detection API](https://github.com/tensorflow/models/blob/master/research/object_detection/README.md)
+
+
 ## Citation
 If you find our code useful, please cite our paper. :)
 
