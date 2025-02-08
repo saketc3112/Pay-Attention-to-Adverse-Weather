@@ -1,0 +1,235 @@
+WARNING:tensorflow:From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py:258: main (from __main__) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use object_detection/model_main.py.
+W1208 18:16:57.668892 140288650209088 deprecation.py:323] From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/absl/app.py:258: main (from __main__) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use object_detection/model_main.py.
+INFO:tensorflow:Reading unweighted datasets: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_snow_camera_gated_lidar_night_4c_dbh/test_snow_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+I1208 18:16:57.706135 140288650209088 dataset_builder.py:163] Reading unweighted datasets: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_snow_camera_gated_lidar_night_4c_dbh/test_snow_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+INFO:tensorflow:Reading record datasets for input file: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_snow_camera_gated_lidar_night_4c_dbh/test_snow_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+I1208 18:16:57.708152 140288650209088 dataset_builder.py:80] Reading record datasets for input file: ['/data/datasets/saket/SeeingThroughFogData/new_data/test_snow_camera_gated_lidar_night_4c_dbh/test_snow_camera_gated_lidar_night_4c_dbh_*.swedentfrecord']
+INFO:tensorflow:Number of filenames to read: 137
+I1208 18:16:57.708299 140288650209088 dataset_builder.py:81] Number of filenames to read: 137
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:105: parallel_interleave (from tensorflow.python.data.experimental.ops.interleave_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.interleave(map_func, cycle_length, block_length, num_parallel_calls=tf.data.experimental.AUTOTUNE)` instead. If sloppy execution is desired, use `tf.data.Options.experimental_determinstic`.
+W1208 18:16:57.715739 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:105: parallel_interleave (from tensorflow.python.data.experimental.ops.interleave_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.interleave(map_func, cycle_length, block_length, num_parallel_calls=tf.data.experimental.AUTOTUNE)` instead. If sloppy execution is desired, use `tf.data.Options.experimental_determinstic`.
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:237: DatasetV1.map_with_legacy_function (from tensorflow.python.data.ops.dataset_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.map()
+W1208 18:16:57.739493 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:237: DatasetV1.map_with_legacy_function (from tensorflow.python.data.ops.dataset_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.map()
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:49: DatasetV1.make_initializable_iterator (from tensorflow.python.data.ops.dataset_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `for ... in dataset:` to iterate over a dataset. If using `tf.estimator`, return the `Dataset` object directly from your input function. As a last resort, you can use `tf.compat.v1.data.make_initializable_iterator(dataset)`.
+W1208 18:17:01.327315 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/builders/dataset_builder.py:49: DatasetV1.make_initializable_iterator (from tensorflow.python.data.ops.dataset_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `for ... in dataset:` to iterate over a dataset. If using `tf.estimator`, return the `Dataset` object directly from your input function. As a last resort, you can use `tf.compat.v1.data.make_initializable_iterator(dataset)`.
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/core/prefetcher.py:57: QueueRunner.__init__ (from tensorflow.python.training.queue_runner_impl) is deprecated and will be removed in a future version.
+Instructions for updating:
+To construct input pipelines, use the `tf.data` module.
+W1208 18:17:01.340044 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/core/prefetcher.py:57: QueueRunner.__init__ (from tensorflow.python.training.queue_runner_impl) is deprecated and will be removed in a future version.
+Instructions for updating:
+To construct input pipelines, use the `tf.data` module.
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/core/prefetcher.py:57: add_queue_runner (from tensorflow.python.training.queue_runner_impl) is deprecated and will be removed in a future version.
+Instructions for updating:
+To construct input pipelines, use the `tf.data` module.
+W1208 18:17:01.340985 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/core/prefetcher.py:57: add_queue_runner (from tensorflow.python.training.queue_runner_impl) is deprecated and will be removed in a future version.
+Instructions for updating:
+To construct input pipelines, use the `tf.data` module.
+WARNING:tensorflow:From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tf_slim/layers/layers.py:2802: Layer.apply (from tensorflow.python.keras.engine.base_layer) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `layer.__call__` method instead.
+W1208 18:17:01.475567 140288650209088 deprecation.py:323] From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tf_slim/layers/layers.py:2802: Layer.apply (from tensorflow.python.keras.engine.base_layer) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `layer.__call__` method instead.
+INFO:tensorflow:Scale of 0 disables regularizer.
+I1208 18:17:02.828254 140288650209088 regularizers.py:99] Scale of 0 disables regularizer.
+INFO:tensorflow:Scale of 0 disables regularizer.
+I1208 18:17:02.985055 140288650209088 regularizers.py:99] Scale of 0 disables regularizer.
+INFO:tensorflow:depth of additional conv before box predictor: 0
+I1208 18:17:02.985516 140288650209088 convolutional_box_predictor.py:156] depth of additional conv before box predictor: 0
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/core/box_list_ops.py:169: where (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.where in 2.0, which has the same broadcast rule as np.where
+W1208 18:17:03.045967 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/core/box_list_ops.py:169: where (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.where in 2.0, which has the same broadcast rule as np.where
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/utils/spatial_transform_ops.py:478: calling crop_and_resize_v1 (from tensorflow.python.ops.image_ops_impl) with box_ind is deprecated and will be removed in a future version.
+Instructions for updating:
+box_ind is deprecated, use box_indices instead
+W1208 18:17:03.541806 140288650209088 deprecation.py:506] From /home/saket/Dense/CGLF_OOD/research/object_detection/utils/spatial_transform_ops.py:478: calling crop_and_resize_v1 (from tensorflow.python.ops.image_ops_impl) with box_ind is deprecated and will be removed in a future version.
+Instructions for updating:
+box_ind is deprecated, use box_indices instead
+WARNING:tensorflow:From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tf_slim/layers/layers.py:1666: flatten (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.flatten instead.
+W1208 18:17:04.111465 140288650209088 deprecation.py:323] From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tf_slim/layers/layers.py:1666: flatten (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.flatten instead.
+INFO:tensorflow:Scale of 0 disables regularizer.
+I1208 18:17:04.113701 140288650209088 regularizers.py:99] Scale of 0 disables regularizer.
+INFO:tensorflow:Scale of 0 disables regularizer.
+I1208 18:17:04.131651 140288650209088 regularizers.py:99] Scale of 0 disables regularizer.
+WARNING:tensorflow:From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/util/dispatch.py:180: batch_gather (from tensorflow.python.ops.array_ops) is deprecated and will be removed after 2017-10-25.
+Instructions for updating:
+`tf.batch_gather` is deprecated, please use `tf.gather` with `batch_dims=-1` instead.
+W1208 18:17:04.687992 140288650209088 deprecation.py:323] From /home/saket/anaconda3/envs/tensorflow-gpu/lib/python3.6/site-packages/tensorflow_core/python/util/dispatch.py:180: batch_gather (from tensorflow.python.ops.array_ops) is deprecated and will be removed after 2017-10-25.
+Instructions for updating:
+`tf.batch_gather` is deprecated, please use `tf.gather` with `batch_dims=-1` instead.
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/core/losses.py:453: softmax_cross_entropy_with_logits (from tensorflow.python.ops.nn_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+
+Future major versions of TensorFlow will allow gradients to flow
+into the labels input on backprop by default.
+
+See `tf.nn.softmax_cross_entropy_with_logits_v2`.
+
+W1208 18:17:05.080353 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/core/losses.py:453: softmax_cross_entropy_with_logits (from tensorflow.python.ops.nn_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+
+Future major versions of TensorFlow will allow gradients to flow
+into the labels input on backprop by default.
+
+See `tf.nn.softmax_cross_entropy_with_logits_v2`.
+
+WARNING:tensorflow:From /home/saket/Dense/CGLF_OOD/research/object_detection/eval_util.py:929: to_int64 (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.cast` instead.
+W1208 18:17:05.360463 140288650209088 deprecation.py:323] From /home/saket/Dense/CGLF_OOD/research/object_detection/eval_util.py:929: to_int64 (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.cast` instead.
+INFO:tensorflow:Starting evaluation at 2021-12-08-23:17:05
+I1208 18:17:05.846500 140288650209088 eval_util.py:506] Starting evaluation at 2021-12-08-23:17:05
+2021-12-08 18:17:05.858810: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2021-12-08 18:17:05.936303: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties: 
+name: Quadro RTX 8000 major: 7 minor: 5 memoryClockRate(GHz): 1.77
+pciBusID: 0000:da:00.0
+2021-12-08 18:17:05.938394: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 1 with properties: 
+name: Quadro RTX 8000 major: 7 minor: 5 memoryClockRate(GHz): 1.77
+pciBusID: 0000:db:00.0
+2021-12-08 18:17:05.938649: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2021-12-08 18:17:05.939860: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2021-12-08 18:17:05.940994: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2021-12-08 18:17:05.941279: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2021-12-08 18:17:05.942887: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2021-12-08 18:17:05.944284: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2021-12-08 18:17:05.948388: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2021-12-08 18:17:05.959009: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0, 1
+2021-12-08 18:17:05.959563: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2021-12-08 18:17:06.007300: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2200000000 Hz
+2021-12-08 18:17:06.009002: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55d3f2da8880 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2021-12-08 18:17:06.009024: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2021-12-08 18:17:06.405631: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55d3f2dd7110 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2021-12-08 18:17:06.405678: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Quadro RTX 8000, Compute Capability 7.5
+2021-12-08 18:17:06.405686: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (1): Quadro RTX 8000, Compute Capability 7.5
+2021-12-08 18:17:06.412878: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties: 
+name: Quadro RTX 8000 major: 7 minor: 5 memoryClockRate(GHz): 1.77
+pciBusID: 0000:da:00.0
+2021-12-08 18:17:06.415509: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 1 with properties: 
+name: Quadro RTX 8000 major: 7 minor: 5 memoryClockRate(GHz): 1.77
+pciBusID: 0000:db:00.0
+2021-12-08 18:17:06.415600: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2021-12-08 18:17:06.415620: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2021-12-08 18:17:06.415637: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2021-12-08 18:17:06.415654: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2021-12-08 18:17:06.415671: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2021-12-08 18:17:06.415688: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2021-12-08 18:17:06.415706: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2021-12-08 18:17:06.426022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0, 1
+2021-12-08 18:17:06.426091: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2021-12-08 18:17:06.432398: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1159] Device interconnect StreamExecutor with strength 1 edge matrix:
+2021-12-08 18:17:06.432417: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1165]      0 1 
+2021-12-08 18:17:06.432425: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1178] 0:   N Y 
+2021-12-08 18:17:06.432432: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1178] 1:   Y N 
+2021-12-08 18:17:06.438526: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1304] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 45977 MB memory) -> physical GPU (device: 0, name: Quadro RTX 8000, pci bus id: 0000:da:00.0, compute capability: 7.5)
+2021-12-08 18:17:06.441860: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1304] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 45977 MB memory) -> physical GPU (device: 1, name: Quadro RTX 8000, pci bus id: 0000:db:00.0, compute capability: 7.5)
+INFO:tensorflow:Restoring parameters from training_all_4c_gated_2/model.ckpt-192763
+I1208 18:17:09.914215 140288650209088 saver.py:1284] Restoring parameters from training_all_4c_gated_2/model.ckpt-192763
+2021-12-08 18:17:13.371556: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2021-12-08 18:17:15.180518: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:25.122909 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-0.
+I1208 18:17:27.097426 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-0.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:27.171008 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-1.
+I1208 18:17:27.998386 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-1.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:28.065093 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-2.
+I1208 18:17:28.789606 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-2.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:28.860502 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-3.
+I1208 18:17:29.859866 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-3.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:29.930029 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-4.
+I1208 18:17:31.185953 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-4.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:31.256754 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-5.
+I1208 18:17:32.458701 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-5.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:32.526569 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-6.
+I1208 18:17:33.845700 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-6.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:33.924244 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-7.
+I1208 18:17:35.229792 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-7.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:35.311793 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-8.
+I1208 18:17:36.225196 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-8.
+INFO:tensorflow:Creating detection visualizations.
+I1208 18:17:36.310396 140288650209088 eval_util.py:178] Creating detection visualizations.
+INFO:tensorflow:Detection visualizations written to summary with tag image-9.
+I1208 18:17:37.216095 140288650209088 eval_util.py:243] Detection visualizations written to summary with tag image-9.
+INFO:tensorflow:Running eval ops batch 100/547
+I1208 18:17:44.118992 140288650209088 eval_util.py:342] Running eval ops batch 100/547
+INFO:tensorflow:Running eval ops batch 200/547
+I1208 18:17:51.682746 140288650209088 eval_util.py:342] Running eval ops batch 200/547
+INFO:tensorflow:Running eval ops batch 300/547
+I1208 18:17:59.286787 140288650209088 eval_util.py:342] Running eval ops batch 300/547
+INFO:tensorflow:Running eval ops batch 400/547
+I1208 18:18:06.645777 140288650209088 eval_util.py:342] Running eval ops batch 400/547
+INFO:tensorflow:Running eval ops batch 500/547
+I1208 18:18:13.933366 140288650209088 eval_util.py:342] Running eval ops batch 500/547
+INFO:tensorflow:Running eval batches done.
+I1208 18:18:17.542924 140288650209088 eval_util.py:376] Running eval batches done.
+INFO:tensorflow:# success: 547
+I1208 18:18:17.543426 140288650209088 eval_util.py:381] # success: 547
+INFO:tensorflow:# skipped: 0
+I1208 18:18:17.543524 140288650209088 eval_util.py:382] # skipped: 0
+I1208 18:18:18.371014 140288650209088 object_detection_evaluation.py:1336] average_precision: 0.059553
+I1208 18:18:19.182853 140288650209088 object_detection_evaluation.py:1336] average_precision: 0.290611
+I1208 18:18:19.952520 140288650209088 object_detection_evaluation.py:1336] average_precision: 0.002957
+I1208 18:18:20.754976 140288650209088 object_detection_evaluation.py:1336] average_precision: 0.109672
+INFO:tensorflow:Writing metrics to tf summary.
+I1208 18:18:21.234461 140288650209088 eval_util.py:90] Writing metrics to tf summary.
+INFO:tensorflow:Losses/Loss/BoxClassifierLoss/classification_loss: 0.024486
+I1208 18:18:21.234904 140288650209088 eval_util.py:97] Losses/Loss/BoxClassifierLoss/classification_loss: 0.024486
+INFO:tensorflow:Losses/Loss/BoxClassifierLoss/localization_loss: 0.026801
+I1208 18:18:21.235279 140288650209088 eval_util.py:97] Losses/Loss/BoxClassifierLoss/localization_loss: 0.026801
+INFO:tensorflow:Losses/Loss/RPNLoss/localization_loss: 0.052559
+I1208 18:18:21.235410 140288650209088 eval_util.py:97] Losses/Loss/RPNLoss/localization_loss: 0.052559
+INFO:tensorflow:Losses/Loss/RPNLoss/objectness_loss: 0.185106
+I1208 18:18:21.235529 140288650209088 eval_util.py:97] Losses/Loss/RPNLoss/objectness_loss: 0.185106
+INFO:tensorflow:PascalBoxes_PerformanceByCategory/AP@0.5IOU/Cyclist: 0.002957
+I1208 18:18:21.235642 140288650209088 eval_util.py:97] PascalBoxes_PerformanceByCategory/AP@0.5IOU/Cyclist: 0.002957
+INFO:tensorflow:PascalBoxes_PerformanceByCategory/AP@0.5IOU/LargeVehicle: 0.109672
+I1208 18:18:21.235751 140288650209088 eval_util.py:97] PascalBoxes_PerformanceByCategory/AP@0.5IOU/LargeVehicle: 0.109672
+INFO:tensorflow:PascalBoxes_PerformanceByCategory/AP@0.5IOU/PassengerCar: 0.290611
+I1208 18:18:21.235859 140288650209088 eval_util.py:97] PascalBoxes_PerformanceByCategory/AP@0.5IOU/PassengerCar: 0.290611
+INFO:tensorflow:PascalBoxes_PerformanceByCategory/AP@0.5IOU/Pedestrian: 0.059553
+I1208 18:18:21.235965 140288650209088 eval_util.py:97] PascalBoxes_PerformanceByCategory/AP@0.5IOU/Pedestrian: 0.059553
+INFO:tensorflow:PascalBoxes_Precision/mAP@0.5IOU: 0.115698
+I1208 18:18:21.236070 140288650209088 eval_util.py:97] PascalBoxes_Precision/mAP@0.5IOU: 0.115698
+INFO:tensorflow:Metrics written to tf summary.
+I1208 18:18:21.236148 140288650209088 eval_util.py:98] Metrics written to tf summary.

@@ -1,0 +1,120 @@
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-08_13-03-00_00000.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-04_00-00-32_00000.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-04_12-20-52_00000.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-07_17-59-12_00100.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-12_09-34-22_00230.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-07_17-56-35_00010.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-04_11-09-42_00300.png'
+ERROR:TfRecordsBuild:Failed DatasetBuild
+Traceback (most recent call last):
+  File "create_generic_db2_4c_db.py", line 84, in <module>
+    args
+  File "create_generic_db2_4c_db.py", line 72, in create_generic_db
+    tf_creator()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 46, in __call__
+    label_shape, feature_shape, feature_sum = self.loop()
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 68, in loop
+    label_shape, feature_shape, feature_sum = self.write_tf_records_file(tf_filename, batch, tfrecord_file_idx)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/tf_records.py", line 114, in write_tf_records_file
+    data = self.conversionClass.read_data(entry_id, total_id)
+  File "/home/saket/Dense/tools_CGL_fusion/CreateTFRecords/generic_tf_tools/data2example_4c_db.py", line 670, in read_data
+    feature = open(file_path, 'rb').read()
+FileNotFoundError: [Errno 2] No such file or directory: '/data/datasets/saket/SeeingThroughFogData/cam_stereo_left_lut/2018-02-07_17-05-42_00300.png'
