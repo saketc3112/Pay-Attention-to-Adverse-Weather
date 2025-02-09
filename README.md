@@ -52,6 +52,8 @@ To address these challenges, our paper introduces a **Global-Local Attention (GL
 
 ### **Contributions**
 
+This repository builds on the [TensorFlow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection), which has been adapted to support multi-sensor fusion settings for enhanced object detection in autonomous driving applications. Contributions and improvements are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
+
 This repository builds on the TensorFlow Object Detection API. Contributions and improvements are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
 
 ### **Citation**
